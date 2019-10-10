@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+using Microsoft.OpenApi.Models;
 
 namespace CoreMongoApp
 {
@@ -33,6 +33,12 @@ namespace CoreMongoApp
             services
                 .AddControllers()
                 .AddNewtonsoftJson(options => options.UseMemberCasing());
+
+            // Register the Swagger generator, defining 1 or more Swagger documents
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Books API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,6 +50,14 @@ namespace CoreMongoApp
             }
 
             app.UseHttpsRedirection();
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Books API v1");
+                c.RoutePrefix = string.Empty;
+            });
 
             app.UseRouting();
 
